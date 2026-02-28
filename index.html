@@ -15,8 +15,24 @@
   .sub{color:#94a3b8;font-size:.95rem;line-height:1.7;max-width:480px;margin:0 auto}
   .card{background:#111827;border:1px solid rgba(59,130,246,.2);border-radius:20px;padding:1.5rem;box-shadow:0 25px 50px rgba(0,0,0,.4);margin-bottom:1rem}
   .label{font-size:.82rem;color:#94a3b8;margin-bottom:.6rem}
+
+  /* Tabs */
+  .tabs{display:flex;border-bottom:1px solid rgba(59,130,246,.15);margin-bottom:1.25rem}
+  .tab{flex:1;padding:.9rem;border:none;background:none;color:#94a3b8;cursor:pointer;font-family:inherit;font-size:.9rem;border-bottom:2px solid transparent;transition:all .2s}
+  .tab.on{color:#3b82f6;border-bottom-color:#3b82f6;background:rgba(59,130,246,.05)}
+
   textarea{width:100%;background:#1a2235;border:1px solid rgba(59,130,246,.2);border-radius:12px;padding:1rem;color:#f1f5f9;font-size:.95rem;resize:vertical;min-height:180px;outline:none;direction:ltr;text-align:left;line-height:1.6;font-family:monospace;transition:border-color .3s}
   textarea:focus{border-color:#3b82f6}
+
+  /* Upload */
+  .upload{border:2px dashed rgba(59,130,246,.3);border-radius:12px;padding:2.5rem 1.5rem;text-align:center;cursor:pointer;transition:all .3s;background:#1a2235}
+  .upload:hover{border-color:#3b82f6;background:rgba(59,130,246,.05)}
+  .upload-icon{font-size:2.5rem;margin-bottom:.75rem}
+  .upload-text{color:#94a3b8;font-size:.9rem;line-height:1.6}
+  .upload-text strong{color:#3b82f6}
+  #preview{max-width:100%;max-height:280px;border-radius:10px;margin-top:1rem;border:1px solid rgba(59,130,246,.2);display:none}
+  .del-btn{margin-top:.5rem;background:none;border:1px solid rgba(255,255,255,.1);color:#94a3b8;border-radius:8px;padding:.3rem .8rem;cursor:pointer;font-size:.8rem;font-family:inherit;display:none}
+
   .cats{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:1.25rem}
   .cat{cursor:pointer;padding:.35rem .85rem;border-radius:100px;font-size:.78rem;border:1px solid rgba(59,130,246,.2);background:#1a2235;color:#94a3b8;transition:all .2s;font-family:inherit}
   .cat:hover,.cat.on{background:rgba(59,130,246,.2);border-color:#3b82f6;color:#3b82f6}
@@ -29,7 +45,6 @@
   .result-card{display:none;background:#111827;border:1px solid rgba(16,185,129,.3);border-radius:20px;overflow:hidden;animation:up .5s ease;margin-top:1.5rem}
   .result-head{background:linear-gradient(135deg,rgba(16,185,129,.12),rgba(59,130,246,.08));padding:1.25rem 1.5rem;border-bottom:1px solid rgba(16,185,129,.2);display:flex;align-items:center;justify-content:space-between}
   .result-title{color:#10b981;font-weight:700}
-  .badge{border-radius:100px;padding:.25rem .75rem;font-size:.78rem;font-weight:600}
   .result-body{padding:1.5rem;line-height:2;font-size:.98rem;white-space:pre-wrap;color:#e2e8f0}
   .result-foot{padding:1rem 1.5rem;border-top:1px solid rgba(255,255,255,.05);display:flex;gap:.75rem;flex-wrap:wrap}
   .sm-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#94a3b8;border-radius:8px;padding:.5rem 1rem;cursor:pointer;font-size:.82rem;font-family:inherit}
@@ -43,16 +58,39 @@
 <div class="wrap">
   <header>
     <h1>مساعد <span>الوثائق الألمانية</span></h1>
-    <p class="sub">انسخ أي رسالة ألمانية رسمية — سنشرح لك بالعربية ماذا تعني وماذا تفعل</p>
+    <p class="sub">انسخ أي رسالة ألمانية رسمية أو حمّل صورتها — سنشرح لك بالعربية ماذا تعني وماذا تفعل</p>
   </header>
 
   <div class="card">
-    <div class="label">📋 انسخ نص الرسالة هنا</div>
-    <textarea id="txt" placeholder="Sehr geehrte/r Herr/Frau...&#10;&#10;انسخ الرسالة الألمانية هنا..."></textarea>
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab on" onclick="switchTab('text', this)">📝 نص الرسالة</button>
+      <button class="tab" onclick="switchTab('image', this)">📷 صورة الرسالة</button>
+    </div>
 
+    <!-- Text panel -->
+    <div id="panel-text">
+      <div class="label">انسخ نص الرسالة هنا</div>
+      <textarea id="txt" placeholder="Sehr geehrte/r Herr/Frau...&#10;&#10;انسخ الرسالة الألمانية هنا..."></textarea>
+    </div>
+
+    <!-- Image panel -->
+    <div id="panel-image" style="display:none">
+      <div class="label">حمّل صورة الرسالة</div>
+      <div class="upload" id="uploadArea" onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+        <div class="upload-icon">📄</div>
+        <div class="upload-text"><strong>اضغط لاختيار صورة</strong><br>أو اسحب وأفلت هنا<br><small style="opacity:.6">JPG, PNG, WebP</small></div>
+        <img id="preview" />
+      </div>
+      <button class="del-btn" id="delBtn" onclick="clearImage()">🗑️ حذف الصورة</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFile(event)">
+    </div>
+
+    <!-- Categories -->
     <div style="margin-top:1.25rem">
       <div class="label">🏷️ نوع الرسالة (اختياري)</div>
-      <div class="cats" id="cats">
+      <div class="cats">
         <button class="cat" onclick="pickCat(this)">Jobcenter / بوليشيت</button>
         <button class="cat" onclick="pickCat(this)">Finanzamt / ضريبة</button>
         <button class="cat" onclick="pickCat(this)">Krankenkasse / تأمين صحي</button>
@@ -76,12 +114,12 @@
   <div class="result-card" id="resultCard">
     <div class="result-head">
       <span class="result-title">✅ تم تحليل رسالتك</span>
-      <span class="badge" id="badge"></span>
+      <span id="badge" style="border-radius:100px;padding:.25rem .75rem;font-size:.78rem;font-weight:600"></span>
     </div>
     <div class="result-body" id="resultBody"></div>
     <div class="result-foot">
-      <button class="sm-btn" onclick="reset()">🔄 رسالة جديدة</button>
-      <button class="sm-btn blue" onclick="copyResult()">📋 نسخ النتيجة</button>
+      <button class="sm-btn" onclick="resetAll()">🔄 رسالة جديدة</button>
+      <button class="sm-btn blue" onclick="navigator.clipboard?.writeText(document.getElementById('resultBody').textContent)">📋 نسخ النتيجة</button>
     </div>
   </div>
 
@@ -90,33 +128,79 @@
 
 <script>
   let selectedCat = "";
+  let activeTab = "text";
+  let imageDataUrl = "";
+
+  function switchTab(tab, btn) {
+    activeTab = tab;
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("on"));
+    btn.classList.add("on");
+    document.getElementById("panel-text").style.display = tab === "text" ? "block" : "none";
+    document.getElementById("panel-image").style.display = tab === "image" ? "block" : "none";
+  }
 
   function pickCat(el) {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("on"));
-    if (selectedCat === el.textContent) { selectedCat = ""; }
-    else { el.classList.add("on"); selectedCat = el.textContent; }
+    selectedCat = selectedCat === el.textContent ? "" : el.textContent;
+    if (selectedCat) el.classList.add("on");
+  }
+
+  function handleFile(e) { processFile(e.target.files[0]); }
+  function handleDrop(e) { e.preventDefault(); processFile(e.dataTransfer.files[0]); }
+
+  function processFile(file) {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      imageDataUrl = e.target.result;
+      document.getElementById("preview").src = imageDataUrl;
+      document.getElementById("preview").style.display = "block";
+      document.getElementById("delBtn").style.display = "inline-block";
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearImage() {
+    imageDataUrl = "";
+    document.getElementById("preview").style.display = "none";
+    document.getElementById("delBtn").style.display = "none";
+    document.getElementById("fileInput").value = "";
   }
 
   async function analyze() {
-    const text = document.getElementById("txt").value.trim();
     const err = document.getElementById("err");
     err.style.display = "none";
     document.getElementById("resultCard").style.display = "none";
 
-    if (!text) { err.textContent = "من فضلك أدخل نص الرسالة"; err.style.display = "block"; return; }
+    // Validate
+    if (activeTab === "text" && !document.getElementById("txt").value.trim()) {
+      err.textContent = "من فضلك أدخل نص الرسالة"; err.style.display = "block"; return;
+    }
+    if (activeTab === "image" && !imageDataUrl) {
+      err.textContent = "من فضلك حمّل صورة الرسالة"; err.style.display = "block"; return;
+    }
 
     document.getElementById("analyzeBtn").disabled = true;
     document.getElementById("spinner").style.display = "block";
 
     try {
+      const body = { category: selectedCat };
+      if (activeTab === "text") {
+        body.text = document.getElementById("txt").value.trim();
+      } else {
+        body.image = imageDataUrl; // send full base64 data URL
+      }
+
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text, category: selectedCat })
+        body: JSON.stringify(body)
       });
+
       const data = await res.json();
       if (data.error) throw new Error(data.error);
       showResult(data.result);
+
     } catch(e) {
       err.textContent = "خطأ: " + e.message;
       err.style.display = "block";
@@ -143,17 +227,14 @@
     document.getElementById("resultCard").scrollIntoView({ behavior: "smooth" });
   }
 
-  function reset() {
+  function resetAll() {
     document.getElementById("txt").value = "";
     document.getElementById("resultCard").style.display = "none";
     document.getElementById("err").style.display = "none";
-    selectedCat = "";
+    selectedCat = ""; imageDataUrl = "";
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("on"));
+    clearImage();
     window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  function copyResult() {
-    navigator.clipboard?.writeText(document.getElementById("resultBody").textContent);
   }
 </script>
 </body>
